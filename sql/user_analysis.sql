@@ -80,6 +80,7 @@ summary_totals AS (
     FROM classified_users
 )
 SELECT
+    segment_order.sort_order AS segment_order,
     segment_order.user_segment,
     COALESCE(segment_counts.user_count, 0) AS user_count,
     ROUND(

@@ -158,8 +158,11 @@ path_counts AS (
     GROUP BY path_type
 )
 SELECT
+    path_order.sort_order AS path_order,
     path_order.path_type,
     COALESCE(path_counts.purchase_count, 0) AS purchase_count,
+    SUM(COALESCE(path_counts.purchase_count, 0)) OVER ()
+        AS total_purchases,
     ROUND(
         COALESCE(path_counts.purchase_count, 0) * 100.0
             / NULLIF(SUM(COALESCE(path_counts.purchase_count, 0)) OVER (), 0),
