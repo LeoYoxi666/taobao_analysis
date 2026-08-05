@@ -46,8 +46,11 @@ The `behavior_type` values represent:
   each user to a percentile-based segment.
 - `src/visualization.py`: Creates and saves all project charts.
 - `src/main.py`: Orchestrates the analysis workflow.
+- `database/`: Documents PostgreSQL setup, import, and integration guidance.
+- `sql/`: Contains the database schema, controlled import workflow, and SQL
+  versions of the existing analyses.
 - `docs/`: Contains the generated PNG charts.
-- `tests/`: Reserved for automated test cases.
+- `tests/`: Contains automated tests using small mock pandas DataFrames.
 
 ## Implemented Analysis
 
@@ -111,6 +114,39 @@ Run the project as a Python module from the project root:
 ```powershell
 python -m src.main
 ```
+
+## SQL Database Layer
+
+The project includes an optional PostgreSQL layer alongside the existing Python
+and pandas workflow. PostgreSQL was selected for its support for indexed
+analytics over the 12-million-row event table, chronological window queries,
+continuous percentile calculations, and direct integration with BI tools.
+
+The normalized schema contains:
+
+- `taobao.users`: one row per user;
+- `taobao.categories`: one row per item category;
+- `taobao.items`: one row per item, linked to its category;
+- `taobao.behaviour_types`: View, Favorite, Cart, and Purchase lookup values;
+- `taobao.behaviour_events`: the chronological user-item event fact table;
+- `taobao.staging_user_behaviour`: the controlled CSV import table.
+
+SQL files reproduce the existing behaviour distribution, hourly activity,
+product rankings, chronological funnel, purchase paths, and user segmentation.
+For example, after creating and importing a local PostgreSQL database, run:
+
+```powershell
+psql -U postgres -d taobao_analysis -f sql/behaviour_analysis.sql
+psql -U postgres -d taobao_analysis -f sql/funnel_analysis.sql
+psql -U postgres -d taobao_analysis -f sql/product_analysis.sql
+psql -U postgres -d taobao_analysis -f sql/user_analysis.sql
+```
+
+The SQL layer currently runs independently, leaving all verified Python logic
+unchanged. A future database connection module can execute these queries and
+return their results as pandas DataFrames after the SQL and Python outputs have
+been validated against each other. Full setup and import instructions are in
+[`database/README.md`](database/README.md).
 
 ## Output Charts
 
