@@ -9,6 +9,10 @@ __pycache__/
 # Local datasets
 data/
 
+# Versioned Power BI aggregate exports (never the raw source dataset)
+!powerbi/data/
+!powerbi/data/*.csv
+
 # Jupyter
 .ipynb_checkpoints/
 

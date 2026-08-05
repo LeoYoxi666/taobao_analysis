@@ -1,0 +1,4 @@
+stage_order,stage_name,user_count,conversion_from_previous,conversion_from_view
+1,View,10000,1.000000,1.000000
+2,Cart after View,8538,0.853800,0.853800
+3,Purchase after Cart,7517,0.880417,0.751700
