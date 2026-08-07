@@ -1,21 +1,39 @@
 # Taobao User Behaviour Analysis
 
-## Project Overview
+## Overview
 
-This project analyzes Taobao user behaviour data using Python and pandas. It
-examines customer activity, product interactions, conversion performance,
-purchase paths, hourly trends, and user segments.
+This project analyzes 12.26 million Taobao user-behaviour events with Python,
+PostgreSQL, and Power BI. The Python analysis, data-quality checks,
+visualizations, PostgreSQL database, full CSV import, SQL analyses, and Power BI
+data exports are complete. Power BI dashboard creation is currently in
+progress.
+
+## Project Status
+
+| Stage | Status |
+| --- | --- |
+| Python analysis, cleaning, and visualization | Complete |
+| PostgreSQL schema and full-data import | Complete |
+| Behaviour, funnel, product/category, and user SQL analysis | Complete |
+| SQL validation and final analysis report | Complete |
+| Power BI query and CSV export layer | Complete |
+| Power BI dashboard | In progress |
+
+The complete SQL findings are in
+[`docs/sql_analysis_results.md`](docs/sql_analysis_results.md). Dashboard field
+definitions and visual guidance are in
+[`powerbi/README.md`](powerbi/README.md).
 
 ## Dataset
 
 The processed dataset contains:
 
-- 12,256,906 records
+- 12,256,906 event records
 - 10,000 users
 - 2,876,947 items
 - 8,916 categories
 
-The dataset columns are:
+Columns:
 
 - `time`
 - `user_id`
@@ -23,83 +41,44 @@ The dataset columns are:
 - `item_category`
 - `behavior_type`
 
-The `behavior_type` values represent:
+Behaviour codes are `1 = View`, `2 = Favorite`, `3 = Cart`, and
+`4 = Purchase`.
 
-| Value | Behaviour |
-| ---: | --- |
-| 1 | View |
-| 2 | Favorite |
-| 3 | Cart |
-| 4 | Purchase |
-
-## Project Structure
-
-- `src/config.py`: Stores the dataset path, behaviour constants, percentile
-  settings, chart paths, and visualization settings.
-- `src/data_processing.py`: Loads the processed dataset, converts the time
-  column to datetime, and performs data-quality checks.
-- `src/analysis.py`: Provides the dataset summary, product analysis, behaviour
-  distribution, chronological funnel, and hourly trend calculations.
-- `src/purchase_paths.py`: Classifies chronological purchase paths for each
-  user-item pair.
-- `src/user_segmentation.py`: Builds user-level activity summaries and assigns
-  each user to a percentile-based segment.
-- `src/visualization.py`: Creates and saves all project charts.
-- `src/main.py`: Orchestrates the analysis workflow.
-- `database/`: Documents PostgreSQL setup, import, and integration guidance.
-- `sql/`: Contains the database schema, controlled import workflow, and SQL
-  versions of the existing analyses.
-- `docs/`: Contains the generated PNG charts.
-- `tests/`: Contains automated tests using small mock pandas DataFrames.
+The local CSV is approximately 492 MB and is excluded from version control.
+Avoid loading it unless full-data analysis is intentionally required.
 
 ## Implemented Analysis
 
-- Dataset summary
-- Missing-value and duplicate checks
+- Dataset summary and data-quality checks
 - Behaviour distribution
-- Top purchased items
-- Top purchased categories
+- Purchased item and category rankings
 - Chronological conversion funnel
-- Hourly activity trend
-- Purchase behaviour path analysis
-- User segmentation
+- Hourly activity and purchase trends
+- Purchase behaviour paths
+- Percentile-based user segmentation
 
-## Main Results
+Python and SQL implementations use the same established rules. SQL outputs were
+validated against the Python baseline, and duplicate source rows were retained
+consistently in both workflows.
 
-### Chronological Conversion Funnel
+## Repository Structure
 
-| Funnel metric | Result |
-| --- | ---: |
-| View users | 10,000 |
-| Cart after view users | 8,538 |
-| Purchase after cart users | 7,517 |
-| View-to-cart conversion | 85.38% |
-| Cart-to-purchase conversion | 88.04% |
-| Overall conversion | 75.17% |
+```text
+src/        Python processing, analysis, segmentation, and visualization
+tests/      Automated tests using small mock DataFrames
+sql/        PostgreSQL schema, controlled import, and analysis queries
+database/   Database architecture and operational guidance
+docs/       Final SQL report and generated charts
+powerbi/    Dashboard queries, validated CSV exports, and refresh script
+notebooks/  Presentation notebook
+```
 
-### User Segmentation
+For durable project assumptions and the current development stage, see
+[`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
 
-| User segment | Users | Percentage |
-| --- | ---: | ---: |
-| High-Frequency Buyer | 1,815 | 18.15% |
-| No Purchase | 1,114 | 11.14% |
-| High Activity Low Purchase | 954 | 9.54% |
-| Regular Buyer | 6,117 | 61.17% |
+## Python Environment
 
-### Purchase Behaviour Paths
-
-| Purchase path | Purchases | Percentage |
-| --- | ---: | ---: |
-| View -> Purchase | 52,784 | 43.91% |
-| View -> Cart -> Purchase | 40,335 | 33.56% |
-| View -> Favorite -> Purchase | 4,781 | 3.98% |
-| View -> Favorite -> Cart -> Purchase | 3,097 | 2.58% |
-| Other | 19,208 | 15.98% |
-
-## Installation
-
-From the project root, create and activate a virtual environment, then install
-the required packages:
+From the project root:
 
 ```powershell
 python -m venv .venv
@@ -107,51 +86,60 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## How to Run
-
-Run the project as a Python module from the project root:
+Run the analysis workflow:
 
 ```powershell
 python -m src.main
 ```
 
-## SQL Database Layer
-
-The project includes an optional PostgreSQL layer alongside the existing Python
-and pandas workflow. PostgreSQL was selected for its support for indexed
-analytics over the 12-million-row event table, chronological window queries,
-continuous percentile calculations, and direct integration with BI tools.
-
-The normalized schema contains:
-
-- `taobao.users`: one row per user;
-- `taobao.categories`: one row per item category;
-- `taobao.items`: one row per item, linked to its category;
-- `taobao.behaviour_types`: View, Favorite, Cart, and Purchase lookup values;
-- `taobao.behaviour_events`: the chronological user-item event fact table;
-- `taobao.staging_user_behaviour`: the controlled CSV import table.
-
-SQL files reproduce the existing behaviour distribution, hourly activity,
-product rankings, chronological funnel, purchase paths, and user segmentation.
-For example, after creating and importing a local PostgreSQL database, run:
+Run the lightweight automated tests without loading the full CSV:
 
 ```powershell
-psql -U postgres -d taobao_analysis -f sql/behaviour_analysis.sql
-psql -U postgres -d taobao_analysis -f sql/funnel_analysis.sql
-psql -U postgres -d taobao_analysis -f sql/product_analysis.sql
-psql -U postgres -d taobao_analysis -f sql/user_analysis.sql
+python -m pytest -q
 ```
 
-The SQL layer currently runs independently, leaving all verified Python logic
-unchanged. A future database connection module can execute these queries and
-return their results as pandas DataFrames after the SQL and Python outputs have
-been validated against each other. Full setup and import instructions are in
+## PostgreSQL Layer
+
+PostgreSQL 17 is set up, the normalized tables have been created, and the full
+CSV has been imported into `taobao_analysis`. The completed SQL analyses cover:
+
+- behaviour distribution and hourly activity;
+- chronological funnel and purchase paths;
+- purchased item and category rankings;
+- user metrics and segmentation.
+
+Database architecture, safe rebuild/import commands, expected validation
+totals, and query execution commands are maintained in
 [`database/README.md`](database/README.md).
 
-## Output Charts
+## Power BI Dashboard
 
-The current generated charts in `docs/` are:
+The database results have been exported into five dashboard-ready aggregate
+tables in `powerbi/data/`:
 
+- user behaviour overview
+- hourly activity trend
+- purchase funnel
+- product/category ranking
+- user segmentation
+
+Dashboard creation is the active project stage. Use Import mode, apply the
+documented data types and sort columns, and keep the aggregate tables
+independent because they have different grains. Refresh exports from PostgreSQL
+with:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\powerbi\refresh_exports.ps1
+```
+
+Do not manually edit generated CSV values. Full refresh, field, visual, and
+layout instructions are in [`powerbi/README.md`](powerbi/README.md).
+
+## Analysis Outputs
+
+- [`docs/sql_analysis_results.md`](docs/sql_analysis_results.md): final SQL
+  analysis, validation, interpretation, and limitations
 - `docs/behavior_distribution.png`
 - `docs/hourly_behavior_trend.png`
 - `docs/purchase_behavior_paths.png`
@@ -159,20 +147,17 @@ The current generated charts in `docs/` are:
 - `docs/user_funnel.png`
 - `docs/user_segmentation.png`
 
-## Notes and Limitations
+## Limitations
 
-- The processed CSV is approximately 492 MB and should not be loaded
-  unnecessarily.
-- Duplicate rows were detected during data-quality analysis but are not
-  automatically deleted.
-- Purchase paths are classified chronologically for each user-item pair.
-- User segments use percentile-based thresholds for activity and purchase
-  frequency.
-- The dataset has no price field, so revenue cannot be calculated.
+- Duplicate records remain pending a separate source-quality decision.
+- The dataset has no price or quantity fields, so revenue and average order
+  value cannot be calculated.
+- Product and category names are unavailable; rankings use identifiers only.
+- Demographic and campaign attributes are unavailable.
+- Funnel results use project-specific chronological user-level rules and should
+  not be treated as a session-based e-commerce funnel.
 
-## Future Improvements
+## Next Milestone
 
-- Add automated tests.
-- Further validate duplicate records before deciding whether to remove them.
-- Add further user-value analysis.
-- Prepare a final report.
+Complete and review the Power BI dashboard, record the export refresh date in
+the report, and then document the saved report or publication location.

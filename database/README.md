@@ -1,88 +1,94 @@
 # PostgreSQL Database Layer
 
-This directory documents the PostgreSQL database layer for the Taobao User
-Behaviour Analysis project. The SQL implementation runs alongside the existing
-Python and pandas workflow; it does not replace or change the verified Python
-analysis.
+## Current Status
 
-For the complete Windows installation, database creation, empty-database
-verification, manual CSV import, and troubleshooting workflow, see
-[`setup.md`](setup.md).
+The PostgreSQL stage is complete. PostgreSQL 17 is installed, the
+`taobao_analysis` database and `taobao` schema have been created, the full CSV
+has been imported successfully, and all four SQL analysis files have been run.
+The results were validated against the established Python outputs and are
+documented in
+[`../docs/sql_analysis_results.md`](../docs/sql_analysis_results.md).
 
-## Why PostgreSQL
-
-PostgreSQL is used because the project contains more than 12 million behaviour
-events and requires chronological window calculations, continuous percentile
-thresholds, indexed joins, and future Power BI access. SQLite would be suitable
-for a portable local prototype, but PostgreSQL provides a stronger long-term
-analytics and BI layer.
+This file contains the durable database architecture, safe rebuild procedure,
+and validation rules.
 
 ## Schema
 
-All database objects are created in the `taobao` schema.
+| Table | Purpose | Primary key |
+| --- | --- | --- |
+| `taobao.users` | One row per observed user | `user_id` |
+| `taobao.categories` | One row per item category | `category_id` |
+| `taobao.items` | One row per item linked to its category | `item_id` |
+| `taobao.behaviour_types` | View, Favorite, Cart, and Purchase lookup | `behaviour_type` |
+| `taobao.behaviour_events` | Chronological user-item event fact table | `event_id` |
+| `taobao.staging_user_behaviour` | Controlled CSV landing table | `staging_id` |
 
-| Table | Purpose | Primary key | Main relationships |
-| --- | --- | --- | --- |
-| `users` | One row per observed user | `user_id` | One user has many behaviour events |
-| `categories` | One row per observed item category | `category_id` | One category has many items |
-| `items` | One row per observed item | `item_id` | Each item belongs to one category and has many events |
-| `behaviour_types` | Lookup for View, Favorite, Cart, and Purchase | `behaviour_type` | One type has many events |
-| `behaviour_events` | Chronological user-item event fact table | `event_id` | References users, items, and behaviour types |
-| `staging_user_behaviour` | Exact landing structure for the source CSV | `staging_id` | Used only for controlled import and validation |
-
-The `event_time` column uses `TIMESTAMP WITHOUT TIME ZONE` so its semantics match
-the current naive pandas datetime values. Duplicate source rows are retained.
-The surrogate `event_id` provides a stable tie-breaker when timestamps are
-identical.
+`event_time` uses `TIMESTAMP WITHOUT TIME ZONE` to match the existing naive
+pandas timestamps. Duplicate source rows are retained. `event_id` provides a
+stable tie-breaker for events with identical timestamps.
 
 ## SQL Files
 
-- `sql/create_tables.sql`: Creates the schema, lookup and core tables,
+- `sql/create_tables.sql`: creates the schema, lookup and core tables,
   constraints, comments, and analytical indexes.
-- `sql/import_data.sql`: Streams the CSV into the staging table with `psql`
-  `\copy`, validates the values, populates normalized tables, and prints import
-  checks.
-- `sql/behaviour_analysis.sql`: Behaviour distribution and hourly activity.
-- `sql/product_analysis.sql`: Top purchased items and categories.
-- `sql/funnel_analysis.sql`: Chronological conversion funnel and purchase paths.
-- `sql/user_analysis.sql`: User-level metrics and percentile-based segmentation.
+- `sql/import_data.sql`: streams and validates the CSV, then populates the
+  normalized tables.
+- `sql/behaviour_analysis.sql`: behaviour distribution and hourly activity.
+- `sql/funnel_analysis.sql`: chronological funnel and purchase paths.
+- `sql/product_analysis.sql`: purchased item and category rankings.
+- `sql/user_analysis.sql`: user metrics and percentile-based segmentation.
 
-## Create the Database
+## Existing Database
 
-Install PostgreSQL and make sure `createdb` and `psql` are available. From the
-project root, create a local database and run the schema file:
+The current database is already populated. Do not rerun
+`sql/import_data.sql`: it intentionally refuses to append when staging or event
+tables contain rows, preventing an accidental duplicate full import.
+
+Run completed analyses independently when results need to be checked:
+
+```powershell
+psql -U postgres -d taobao_analysis -v ON_ERROR_STOP=1 -f sql/behaviour_analysis.sql
+psql -U postgres -d taobao_analysis -v ON_ERROR_STOP=1 -f sql/funnel_analysis.sql
+psql -U postgres -d taobao_analysis -v ON_ERROR_STOP=1 -f sql/product_analysis.sql
+psql -U postgres -d taobao_analysis -v ON_ERROR_STOP=1 -f sql/user_analysis.sql
+```
+
+Use the appropriate local PostgreSQL role if it is not `postgres`.
+
+## Rebuild Procedure
+
+Use this procedure only for a new empty database or a deliberately approved
+rebuild. PostgreSQL client tools (`createdb`, `psql`, and `pg_isready`) must be
+installed and available on `Path`. PostgreSQL installation documentation is
+available from the
+[official Windows download page](https://www.postgresql.org/download/windows/).
+
+From the repository root:
 
 ```powershell
 createdb -U postgres taobao_analysis
 psql -U postgres -d taobao_analysis -v ON_ERROR_STOP=1 -f sql/create_tables.sql
-```
-
-Use your own PostgreSQL role instead of `postgres` when appropriate. Do not put
-database passwords in the repository.
-
-## Import the Data
-
-The import is deliberately separate from schema creation. It is the only step
-that reads the large CSV, so run it manually only when the database is ready:
-
-```powershell
 psql -U postgres -d taobao_analysis -v ON_ERROR_STOP=1 -f sql/import_data.sql
 ```
 
-Important import behaviour:
+Important import behavior:
 
-- Run the command from the repository root because the client-side `\copy`
-  path is `data/user_behavior_processed.csv`.
-- The file is streamed by `psql`; pandas is not involved.
-- The script refuses to append when staging or event tables already contain
-  rows, preventing an accidental duplicate full import.
-- It validates that behaviour codes are between 1 and 4.
-- It validates the one-item-to-one-category assumption before normalizing the
-  item table.
-- It preserves duplicate event rows and reports their count instead of deleting
-  them.
+- The command must run from the repository root because `\copy` reads
+  `data/user_behavior_processed.csv`.
+- Import is manual and separate from schema creation.
+- The source is streamed with `psql`; pandas is not involved.
+- Behaviour codes must be between 1 and 4.
+- Each item must map to exactly one category.
+- Duplicate event rows are preserved and reported, not deleted.
+- Table statistics are updated after import.
 
-After import, compare the printed values with the verified project totals:
+The import reads approximately 492 MB and requires additional space for the
+staging table, normalized tables, and indexes. Do not interrupt it merely
+because recent output has not appeared.
+
+## Validation
+
+After an import, these totals must match before analysis results are accepted:
 
 | Check | Expected value |
 | --- | ---: |
@@ -91,59 +97,36 @@ After import, compare the printed values with the verified project totals:
 | Items | 2,876,947 |
 | Categories | 8,916 |
 
-## Run the Analysis Queries
-
-Each analysis file can be executed independently:
+Basic verification commands:
 
 ```powershell
-psql -U postgres -d taobao_analysis -f sql/behaviour_analysis.sql
-psql -U postgres -d taobao_analysis -f sql/product_analysis.sql
-psql -U postgres -d taobao_analysis -f sql/funnel_analysis.sql
-psql -U postgres -d taobao_analysis -f sql/user_analysis.sql
+psql -U postgres -d taobao_analysis -c "\dt taobao.*"
+psql -U postgres -d taobao_analysis -c "SELECT COUNT(*) FROM taobao.behaviour_events;"
+psql -U postgres -d taobao_analysis -c "SELECT * FROM taobao.behaviour_types ORDER BY behaviour_type;"
 ```
 
-The SQL intentionally follows the current Python rules:
+The lookup must contain `1 = View`, `2 = Favorite`, `3 = Cart`, and
+`4 = Purchase`. Stop and investigate if totals or mappings differ; do not
+silently truncate, deduplicate, or re-import.
 
-- Funnel cart events must occur strictly after a user's first view, and
-  purchases must occur strictly after the valid cart.
-- Purchase paths are ordered by `event_time` and then `event_id`, retain
-  repeated behaviours, and classify every purchase event.
-- User segmentation uses continuous 80th-percentile activity and purchase
-  thresholds with the same segment priority as the Python module.
+## Analytical Consistency
 
-## Python Integration
+The SQL layer preserves the established Python rules:
 
-The current Python pipeline continues to read the CSV and remains the verified
-baseline. A later integration can add a separate database connection module
-using a PostgreSQL driver or SQLAlchemy, then return SQL result sets as pandas
-DataFrames. That connection should be optional and should not rewrite the
-existing analysis functions until SQL outputs have been checked against the
-verified Python results.
+- Cart must occur strictly after a user's first View, and Purchase must occur
+  strictly after the valid Cart.
+- Purchase paths are ordered by `event_time` and `event_id`, retain repeated
+  behaviours, and classify every purchase event.
+- Segmentation uses continuous 80th-percentile activity and purchase thresholds
+  with the same segment priority as Python.
 
-Store connection settings in environment variables, for example:
+## Power BI Handoff
 
-```text
-TAOBAO_DB_HOST=localhost
-TAOBAO_DB_PORT=5432
-TAOBAO_DB_NAME=taobao_analysis
-TAOBAO_DB_USER=your_user
-TAOBAO_DB_PASSWORD=your_password
-```
+The completed SQL results feed five read-only export queries in
+`../powerbi/queries/`. The checked-in aggregates and guarded refresh workflow
+are documented in [`../powerbi/README.md`](../powerbi/README.md). Dashboard
+creation is currently in progress.
 
-Do not commit real credentials, database files, or database dumps.
-
-## Power BI Preparation
-
-Power BI can connect directly to PostgreSQL. For the first dashboard, use the
-aggregated query results rather than importing the entire event table. The
-recommended next database step is to expose the validated analyses as views or
-materialized views and grant Power BI a read-only database role.
-
-Suggested Power BI datasets are:
-
-- behaviour distribution;
-- hourly action and purchase counts;
-- funnel counts and conversion percentages;
-- purchase path counts and percentages;
-- user segment counts and percentages;
-- top purchased items and categories.
+For a deployed dashboard, use a dedicated read-only reporting role rather than
+an administrator account. Never commit database passwords, connection secrets,
+database files, or dumps.

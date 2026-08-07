@@ -1,135 +1,148 @@
-# Taobao User Behavior Analysis Project Context
+# Taobao User Behaviour Analysis Project Context
 
-## Project Goal
+## Purpose
 
-This project analyzes Taobao user behavior data using Python.
+This document is the durable project context for future development and AI
+assistance. It records the current stage, established analytical rules, trusted
+artifacts, and constraints. Detailed findings belong in the final analysis
+report rather than being duplicated here.
 
-Dataset:
-- user_behavior_processed.csv
-- Around 12.25 million rows
-- Do not load the CSV automatically unless necessary.
+The project analyzes Taobao user behaviour through a Python/pandas workflow, a
+PostgreSQL analytics layer, and a Power BI reporting layer.
 
-## Current Project Structure
+## Current Stage
 
-src/
-├── main.py
-├── config.py
-├── data_processing.py
-├── analysis.py
-├── purchase_paths.py
-├── user_segmentation.py
-└── visualization.py
+| Workstream | Status |
+| --- | --- |
+| Python data loading and analysis | Complete |
+| Data cleaning and quality checks | Complete |
+| Python visualizations | Complete |
+| Automated tests | Implemented |
+| PostgreSQL 17 setup and schema creation | Complete |
+| Full CSV import | Complete |
+| SQL behaviour analysis | Complete |
+| SQL purchase funnel and path analysis | Complete |
+| SQL product/category analysis | Complete |
+| SQL user analysis and segmentation | Complete |
+| SQL result validation and final report | Complete |
+| Power BI aggregate exports | Complete |
+| Power BI dashboard creation | In progress |
 
+The current task is to build the Power BI dashboard from the validated exports
+in `powerbi/data/`. No new Python or SQL analysis is required for that stage
+unless a dashboard requirement exposes a genuine data gap.
 
-## Completed Features
+## Dataset
 
-The following features are already implemented:
+The local source is `data/user_behavior_processed.csv`.
 
-1. Data loading
-- Load processed CSV
-- Dataset summary
-- Column inspection
+| Measure | Verified value |
+| --- | ---: |
+| Event records | 12,256,906 |
+| Users | 10,000 |
+| Items | 2,876,947 |
+| Categories | 8,916 |
 
-2. Data quality analysis
-- Missing value checking
-- Duplicate checking
+The CSV is approximately 492 MB. Do not load it for routine inspection,
+documentation work, or unit tests.
 
-3. Basic behavior analysis
-- Behavior distribution
-- User count
-- Item count
-- Category count
+Source columns:
 
-4. Product analysis
-- Top purchased items
-- Top purchased categories
+- `time`
+- `user_id`
+- `item_id`
+- `item_category`
+- `behavior_type`
 
-5. User funnel analysis
-- View
-- Cart
-- Purchase
-- Conversion rates
+Behaviour codes are `1 = View`, `2 = Favorite`, `3 = Cart`, and
+`4 = Purchase`.
 
-6. Time analysis
-- Hourly user activity
-- Hourly purchase activity
+## Trusted Project Artifacts
 
-7. Purchase behavior path analysis
+- `src/`: Python data processing, analysis, segmentation, purchase paths, and
+  visualization modules.
+- `tests/`: lightweight tests using mock DataFrames; they do not require the
+  full CSV.
+- `sql/create_tables.sql`: PostgreSQL schema, constraints, and indexes.
+- `sql/import_data.sql`: guarded full-data import and validation workflow.
+- `sql/behaviour_analysis.sql`: behaviour distribution and hourly activity.
+- `sql/funnel_analysis.sql`: chronological funnel and purchase paths.
+- `sql/product_analysis.sql`: purchased item and category rankings.
+- `sql/user_analysis.sql`: user metrics and percentile-based segmentation.
+- `docs/sql_analysis_results.md`: final validated SQL analysis and findings.
+- `docs/*.png`: completed analysis charts.
+- `powerbi/queries/`: read-only dashboard export queries.
+- `powerbi/data/`: five validated aggregate CSV datasets.
+- `powerbi/refresh_exports.ps1`: guarded PostgreSQL-to-CSV refresh workflow.
 
-Examples:
-- View → Purchase
-- View → Cart → Purchase
-- View → Favorite → Purchase
+## Established Analytical Rules
 
-8. User segmentation
+- Duplicate source events are reported and retained. Do not deduplicate without
+  a separate source-quality decision.
+- Funnel stages are chronological: Cart must occur after View, and Purchase
+  must occur after a valid Cart.
+- Purchase paths are evaluated per user-item history and ordered by event time
+  with the database event ID as the tie-breaker.
+- User segmentation uses continuous 80th-percentile thresholds for activity
+  and purchase frequency, following the existing segment priority.
+- Python results are the original baseline; the completed SQL outputs were
+  validated against them.
+- The dataset has no price, quantity, product name, category name, demographic,
+  or campaign fields. Do not make revenue or demographic claims.
 
-Current segments:
+## PostgreSQL State
 
-- High-Frequency Buyer
-- No Purchase
-- High Activity Low Purchase
-- Regular Buyer
+PostgreSQL 17 is installed, the `taobao_analysis` database is populated, and
+the analysis queries have completed successfully. All project objects are in
+the `taobao` schema:
 
+- `users`
+- `categories`
+- `items`
+- `behaviour_types`
+- `behaviour_events`
+- `staging_user_behaviour`
 
-## Current Results
+The full import must not be rerun against populated tables. The import script
+intentionally refuses to append when staging or event data already exists.
+Credentials, database files, and dumps must not be committed.
 
-Total users:
+## Power BI State
 
-10000
+Five aggregate datasets are ready for dashboard use:
 
-User segmentation:
+- `user_behaviour_overview.csv`
+- `hourly_activity_trend.csv`
+- `purchase_funnel.csv`
+- `product_category_ranking.csv`
+- `user_segmentation.csv`
 
-High-Frequency Buyer:
-1815 users
+These tables use different analytical grains and should remain independent in
+Power BI unless a deliberate model redesign is made. Identifiers must be stored
+as text, share/conversion fields formatted as percentages, and explicit sort
+columns applied as documented in `powerbi/README.md`.
 
-No Purchase:
-1114 users
+Generated CSV values must not be edited manually. Update the corresponding
+read-only query and rerun `powerbi/refresh_exports.ps1` so PostgreSQL remains
+the source of truth.
 
-High Activity Low Purchase:
-954 users
+## Working Rules for Future Assistance
 
-Regular Buyer:
-6117 users
+- Preserve the completed Python and SQL logic unless a change is explicitly
+  requested and regression-checked.
+- Do not load the large CSV unnecessarily.
+- Do not duplicate analysis functions or move orchestration logic back into
+  `src/main.py`.
+- Do not rerun the database import without confirming an empty intended target.
+- Do not commit secrets, local database files, dumps, or Power BI cache files.
+- Keep detailed findings in `docs/sql_analysis_results.md`, database operations
+  in `database/README.md`, and dashboard instructions in `powerbi/README.md`.
+- Update this document when the project changes stage.
 
+## Next Milestone
 
-## Engineering Improvements Already Completed
-
-- Configuration moved into config.py
-- Analysis functions separated into modules
-- Visualization separated
-- main.py only controls workflow
-- Avoid duplicated calculations
-- Use python -m src.main to run
-
-
-## Important Rules
-
-Do not:
-- Load the 492MB CSV unnecessarily
-- Rewrite existing completed analysis
-- Duplicate functions
-- Put all code back into main.py
-
-
-## Current Completion
-
-Approximately 90%.
-
-Remaining tasks:
-
-1. Add automated tests
-2. Improve README documentation
-3. Add final analysis conclusions
-4. Prepare final report
-
-
-## Next Recommended Step
-
-Before adding new features:
-Review current project quality and create automated tests.
-
-Focus on:
-- user segmentation tests
-- funnel calculation tests
-- purchase path tests
-- data processing tests
+Complete the Power BI dashboard using the layout and field guidance in
+`powerbi/README.md`: Overview, Activity, Conversion, Products, and Users. The
+dashboard should display the export refresh date and respect the documented
+limitations. After the report is reviewed, record its location and publication
+status here and in the root README.

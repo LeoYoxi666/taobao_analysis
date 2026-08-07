@@ -13,6 +13,10 @@ data/
 !powerbi/data/
 !powerbi/data/*.csv
 
+# Power BI Desktop local caches
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
 # Jupyter
 .ipynb_checkpoints/
 

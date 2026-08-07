@@ -259,5 +259,5 @@ User segmentation identifies a large Regular Buyer population, a meaningful
 High-Frequency Buyer group, and two clear conversion opportunities among highly
 active low-purchase users and users with no purchase. Together, these results
 provide a reproducible SQL foundation for the final project discussion and for
-a later Power BI dashboard, while the stated data limitations define the scope
-of valid conclusions.
+the Power BI dashboard currently under development, while the stated data
+limitations define the scope of valid conclusions.

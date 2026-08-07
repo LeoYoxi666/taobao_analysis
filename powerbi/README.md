@@ -4,6 +4,13 @@ This folder contains read-only PostgreSQL queries and CSV extracts designed for
 the Taobao User Behaviour Analysis dashboard. It does not change the database
 schema or the existing Python analysis.
 
+## Current Stage
+
+Data preparation is complete: all five exports have been generated from the
+validated PostgreSQL analyses and passed the checks listed below. Power BI
+dashboard creation is now in progress. A finished report file is not yet
+tracked in this repository.
+
 ## Folder Structure
 
 ```text
@@ -27,9 +34,9 @@ powerbi/
 ## Refresh the CSV Exports
 
 The checked-in summary values are based on the verified SQL analysis report.
-Before building the Power BI dashboard, run the refresh script so all five CSV
-files—including the exact hourly values and Top 10 item ranking—come directly
-from PostgreSQL.
+Run the refresh script when the SQL source changes or before validating a
+dashboard release so all five CSV files—including the exact hourly values and
+Top 10 item ranking—come directly from PostgreSQL.
 
 From the project root:
 
