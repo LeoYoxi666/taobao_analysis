@@ -109,13 +109,20 @@ Credentials, database files, and dumps must not be committed.
 
 ## Power BI State
 
-Five aggregate datasets are ready for dashboard use:
+Five core aggregate datasets are ready for dashboard use:
 
 - `user_behaviour_overview.csv`
 - `hourly_activity_trend.csv`
 - `purchase_funnel.csv`
 - `product_category_ranking.csv`
 - `user_segmentation.csv`
+
+Dashboard 1, Module 2 has four additional SQL-backed exports ready for refresh:
+
+- `weekday_hour_behaviour.csv`
+- `weekday_hour_purchase_rate.csv`
+- `daily_behaviour_trend.csv`
+- `user_activity_distribution.csv`
 
 These tables use different analytical grains and should remain independent in
 Power BI unless a deliberate model redesign is made. Identifiers must be stored

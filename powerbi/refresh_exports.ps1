@@ -52,6 +52,26 @@ $exports = @(
         Query = "05_user_segmentation.sql"
         Output = "user_segmentation.csv"
         ExpectedRows = 4
+    },
+    @{
+        Query = "06_weekday_hour_behaviour.sql"
+        Output = "weekday_hour_behaviour.csv"
+        ExpectedRows = 672
+    },
+    @{
+        Query = "07_weekday_hour_purchase_rate.sql"
+        Output = "weekday_hour_purchase_rate.csv"
+        ExpectedRows = 168
+    },
+    @{
+        Query = "08_daily_behaviour_trend.sql"
+        Output = "daily_behaviour_trend.csv"
+        ExpectedRows = 124
+    },
+    @{
+        Query = "09_user_activity_distribution.sql"
+        Output = "user_activity_distribution.csv"
+        ExpectedRows = 22
     }
 )
 

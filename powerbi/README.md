@@ -6,10 +6,11 @@ schema or the existing Python analysis.
 
 ## Current Stage
 
-Data preparation is complete: all five exports have been generated from the
-validated PostgreSQL analyses and passed the checks listed below. Power BI
-dashboard creation is now in progress. A finished report file is not yet
-tracked in this repository.
+Data preparation is complete: the five core exports have been generated from
+the validated PostgreSQL analyses and passed the checks listed below. Power BI
+dashboard creation is now in progress. Module 2 also has four additional
+export queries ready to refresh before it is built. A finished report file is
+not yet tracked in this repository.
 
 ## Folder Structure
 
@@ -67,6 +68,25 @@ Optional connection parameters can be supplied when needed:
 
 Do not manually edit generated CSV values. Change the corresponding query and
 refresh the exports so PostgreSQL remains the source of truth.
+
+## Dashboard 1, Module 2 Exports
+
+The four files below support the user behaviour timing and distribution module.
+They are refreshed by the same script as the core exports and intentionally
+remain independent aggregate tables.
+
+| File | Rows | Purpose |
+| --- | ---: | --- |
+| `weekday_hour_behaviour.csv` | 672 | 7 weekdays x 24 hours x 4 behaviour types for the selectable activity heatmap |
+| `weekday_hour_purchase_rate.csv` | 168 | 7 weekdays x 24 hours for the purchase-rate heatmap |
+| `daily_behaviour_trend.csv` | 124 | 31 days x 4 behaviour types in the current snapshot for the daily combo chart |
+| `user_activity_distribution.csv` | 22 | 14 logarithmic activity bins plus 8 purchase-frequency bins |
+
+The rate in the weekday-hour and daily exports is `distinct purchasing users /
+distinct viewing users` within the same time cell. It is a same-period
+propensity indicator, not a chronological session-conversion funnel. See
+[`module_2_build_guide.md`](module_2_build_guide.md) for the complete import,
+measure, visual, and review instructions.
 
 ## Dataset and Visual Mapping
 

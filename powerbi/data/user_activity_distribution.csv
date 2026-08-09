@@ -1,0 +1,23 @@
+distribution_order,distribution_type,bin_order,bin_label,user_count,user_share,purchase_rate
+1,Activity,1,1,4,0.000400,0.000000
+1,Activity,2,2-3,15,0.001500,0.133333
+1,Activity,3,4-7,16,0.001600,0.062500
+1,Activity,4,8-15,62,0.006200,0.322581
+1,Activity,5,16-31,121,0.012100,0.446281
+1,Activity,6,32-63,287,0.028700,0.595819
+1,Activity,7,64-127,509,0.050900,0.683694
+1,Activity,8,128-255,1006,0.100600,0.788270
+1,Activity,9,256-511,1788,0.178800,0.881432
+1,Activity,10,"512-1,023",2316,0.231600,0.926166
+1,Activity,11,"1,024-2,047",2127,0.212700,0.969441
+1,Activity,12,"2,048-4,095",1281,0.128100,0.980484
+1,Activity,13,"4,096-8,191",410,0.041000,0.985366
+1,Activity,14,"8,192+",58,0.005800,0.931034
+2,Purchase Frequency,1,0,1114,0.111400,
+2,Purchase Frequency,2,1,738,0.073800,
+2,Purchase Frequency,3,2-3,1309,0.130900,
+2,Purchase Frequency,4,4-7,2012,0.201200,
+2,Purchase Frequency,5,8-15,2391,0.239100,
+2,Purchase Frequency,6,16-31,1602,0.160200,
+2,Purchase Frequency,7,32-63,693,0.069300,
+2,Purchase Frequency,8,64+,141,0.014100,
