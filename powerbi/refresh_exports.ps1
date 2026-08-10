@@ -72,6 +72,21 @@ $exports = @(
         Query = "09_user_activity_distribution.sql"
         Output = "user_activity_distribution.csv"
         ExpectedRows = 22
+    },
+    @{
+        Query = "10_behaviour_transition_matrix.sql"
+        Output = "behaviour_transition_matrix.csv"
+        ExpectedRows = 20
+    },
+    @{
+        Query = "11_behaviour_depth_conversion.sql"
+        Output = "behaviour_depth_conversion.csv"
+        ExpectedRows = 24
+    },
+    @{
+        Query = "12_activity_category_preference.sql"
+        Output = "activity_category_preference.csv"
+        ExpectedRows = 15
     }
 )
 

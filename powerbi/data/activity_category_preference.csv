@@ -1,0 +1,16 @@
+activity_segment_order,activity_segment,preference_rank,category_id,interaction_count,user_count,interaction_share
+1,Low Activity,1,1863,13995,974,0.019826
+1,Low Activity,2,6000,13182,1087,0.018674
+1,Low Activity,3,6648,10446,649,0.014798
+1,Low Activity,4,5027,9705,819,0.013749
+1,Low Activity,5,13230,8949,841,0.012678
+2,Medium Activity,1,1863,67390,2123,0.026367
+2,Medium Activity,2,5027,49465,1911,0.019354
+2,Medium Activity,3,13230,47884,1985,0.018735
+2,Medium Activity,4,5399,43858,1843,0.017160
+2,Medium Activity,5,5894,42794,1834,0.016744
+3,High Activity,1,1863,311862,2900,0.034670
+3,High Activity,2,13230,299940,2793,0.033344
+3,High Activity,3,5894,279388,2743,0.031060
+3,High Activity,4,5027,275110,2769,0.030584
+3,High Activity,5,6513,246984,2740,0.027457
