@@ -1,3 +1,5 @@
+-- Power BI dataset: current-to-next behaviour transition matrix.
+-- Exit means the final observed event for a user, not a session-level exit.
 WITH sequenced_events AS (
     SELECT
         e.user_id,

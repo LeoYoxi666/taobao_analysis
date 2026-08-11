@@ -1,3 +1,5 @@
+"""Load the processed event file and run basic quality checks."""
+
 import pandas as pd
 
 from .config import DATA_FILE_PATH

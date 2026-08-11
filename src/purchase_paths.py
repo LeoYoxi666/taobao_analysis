@@ -1,3 +1,5 @@
+"""Classify chronological purchase paths for each user-item history."""
+
 import pandas as pd
 
 from .config import (
@@ -17,7 +19,7 @@ def analyze_purchase_behavior_paths(df, purchase_data):
         "Other"
     ]
 
-    # Optimize by keeping only user-item pairs that contain a purchase
+    # Ignore user-item histories that never reach Purchase.
     purchase_pairs = (
         purchase_data[["user_id", "item_id"]]
         .drop_duplicates()
@@ -34,7 +36,7 @@ def analyze_purchase_behavior_paths(df, purchase_data):
         .sort_values(["user_id", "item_id", "time"], kind="mergesort")
     )
 
-    # Use vectorized cumulative states instead of iterating over pandas groups
+    # Cumulative flags capture which prerequisite behaviours occurred earlier.
     purchase_path_groups = purchase_path_data.groupby(
         ["user_id", "item_id"],
         sort=False,
@@ -81,7 +83,7 @@ def analyze_purchase_behavior_paths(df, purchase_data):
         sort=False
     ).cummax()
 
-    # Apply the original path precedence with vectorized assignments
+    # Later assignments implement the documented most-specific-path precedence.
     classified_purchase_paths = pd.Series(
         "Other",
         index=purchase_path_data.index

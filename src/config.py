@@ -1,3 +1,5 @@
+"""Shared input, output, behaviour-code, and chart settings."""
+
 # Data input
 DATA_FILE_PATH = "data/user_behavior_processed.csv"
 

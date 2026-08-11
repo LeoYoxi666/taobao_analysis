@@ -1,3 +1,5 @@
+-- Power BI dataset: behaviour-depth buckets and their user purchase rates.
+-- Purchase rate is the share of users in a bucket with at least one purchase.
 WITH user_behaviour_summary AS (
     SELECT
         e.user_id,

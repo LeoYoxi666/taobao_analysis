@@ -26,11 +26,13 @@ PostgreSQL analytics layer, and a Power BI reporting layer.
 | SQL user analysis and segmentation | Complete |
 | SQL result validation and final report | Complete |
 | Power BI aggregate exports | Complete |
+| Dashboard 1 - Module 2 | Complete |
+| Dashboard 1 - Module 4 | Complete |
 | Power BI dashboard creation | In progress |
 
-The current task is to build the Power BI dashboard from the validated exports
-in `powerbi/data/`. No new Python or SQL analysis is required for that stage
-unless a dashboard requirement exposes a genuine data gap.
+Dashboard 1 Modules 2 and 4 are built from the validated exports in
+`powerbi/data/`. Remaining dashboard work should reuse the existing data layer
+unless a requirement exposes a genuine data gap.
 
 ## Dataset
 
@@ -72,7 +74,7 @@ Behaviour codes are `1 = View`, `2 = Favorite`, `3 = Cart`, and
 - `docs/sql_analysis_results.md`: final validated SQL analysis and findings.
 - `docs/*.png`: completed analysis charts.
 - `powerbi/queries/`: read-only dashboard export queries.
-- `powerbi/data/`: five validated aggregate CSV datasets.
+- `powerbi/data/`: 12 validated aggregate CSV datasets.
 - `powerbi/refresh_exports.ps1`: guarded PostgreSQL-to-CSV refresh workflow.
 
 ## Established Analytical Rules
@@ -124,6 +126,15 @@ Dashboard 1, Module 2 has four additional SQL-backed exports ready for refresh:
 - `daily_behaviour_trend.csv`
 - `user_activity_distribution.csv`
 
+Dashboard 1, Module 4 has three additional SQL-backed exports:
+
+- `behaviour_transition_matrix.csv`
+- `behaviour_depth_conversion.csv`
+- `activity_category_preference.csv`
+
+Modules 2 and 4 have been assembled in the local Power BI report. The report
+location and publication status are not yet documented in the repository.
+
 These tables use different analytical grains and should remain independent in
 Power BI unless a deliberate model redesign is made. Identifiers must be stored
 as text, share/conversion fields formatted as percentages, and explicit sort
@@ -148,8 +159,6 @@ the source of truth.
 
 ## Next Milestone
 
-Complete the Power BI dashboard using the layout and field guidance in
-`powerbi/README.md`: Overview, Activity, Conversion, Products, and Users. The
-dashboard should display the export refresh date and respect the documented
-limitations. After the report is reviewed, record its location and publication
+Review Modules 2 and 4, complete any remaining dashboard modules, and add the
+export refresh date. After review, record the PBIX location and publication
 status here and in the root README.

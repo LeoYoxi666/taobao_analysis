@@ -1,3 +1,5 @@
+"""Build user metrics and assign mutually exclusive activity segments."""
+
 import math
 
 import pandas as pd
@@ -61,6 +63,7 @@ def analyze_user_segmentation(df):
         fill_value=0
     )
 
+    # Thresholds follow the project's continuous 80th-percentile rule.
     high_activity_threshold = user_summary["total_actions"].quantile(
         HIGH_ACTIVITY_QUANTILE
     )
@@ -81,6 +84,7 @@ def analyze_user_segmentation(df):
         & (user_summary["total_actions"] >= high_activity_threshold)
     )
 
+    # Assignment order makes the four segments mutually exclusive.
     user_summary["segment"] = "Regular Buyer"
     user_summary.loc[
         high_activity_low_purchase_users,

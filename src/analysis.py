@@ -1,3 +1,5 @@
+"""Core descriptive, funnel, and hourly analyses."""
+
 from .config import (
     CART_BEHAVIOR,
     PURCHASE_BEHAVIOR,
@@ -68,16 +70,17 @@ def calculate_behavior_distribution(df):
 
 
 def calculate_chronological_funnel(df):
+    """Count users reaching View -> Cart -> Purchase in strict time order."""
+
     print("\nUser behaviour funnel:")
 
-    # Identify the first view for each user
+    # Each stage must occur strictly after the preceding valid stage.
     view_times = (
         df[df["behavior_type"] == VIEW_BEHAVIOR]
         .groupby("user_id")["time"]
         .min()
     )
 
-    # Find each user's first cart event chronologically after a view
     cart_events = df[df["behavior_type"] == CART_BEHAVIOR][
         ["user_id", "time"]
     ].copy()
@@ -89,7 +92,6 @@ def calculate_chronological_funnel(df):
         .min()
     )
 
-    # Find each user's first purchase chronologically after a valid cart event
     purchase_events = df[df["behavior_type"] == PURCHASE_BEHAVIOR][
         ["user_id", "time"]
     ].copy()

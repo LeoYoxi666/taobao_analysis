@@ -3,9 +3,9 @@
 ## Overview
 
 This project analyzes 12.26 million Taobao user-behaviour events with Python,
-PostgreSQL, and Power BI. The Python analysis, data-quality checks,
-visualizations, PostgreSQL database, full CSV import, SQL analyses, and Power BI
-data exports are complete. Power BI dashboard creation is currently in
+PostgreSQL, and Power BI. The Python and PostgreSQL analysis layers are
+complete, all 12 dashboard datasets are exported, and Dashboard 1 Modules 2
+and 4 have been built in Power BI. The remaining dashboard work is still in
 progress.
 
 ## Project Status
@@ -17,7 +17,9 @@ progress.
 | Behaviour, funnel, product/category, and user SQL analysis | Complete |
 | SQL validation and final analysis report | Complete |
 | Power BI query and CSV export layer | Complete |
-| Power BI dashboard | In progress |
+| Power BI dashboard data layer (12 exports) | Complete |
+| Dashboard 1 - Modules 2 and 4 | Complete |
+| Remaining Power BI dashboard work | In progress |
 
 The complete SQL findings are in
 [`docs/sql_analysis_results.md`](docs/sql_analysis_results.md). Dashboard field
@@ -114,27 +116,19 @@ totals, and query execution commands are maintained in
 
 ## Power BI Dashboard
 
-The database results have been exported into five dashboard-ready aggregate
-tables in `powerbi/data/`:
-
-- user behaviour overview
-- hourly activity trend
-- purchase funnel
-- product/category ranking
-- user segmentation
-
-Dashboard creation is the active project stage. Use Import mode, apply the
-documented data types and sort columns, and keep the aggregate tables
-independent because they have different grains. Refresh exports from PostgreSQL
-with:
+The database results are exported into 12 dashboard-ready aggregate tables in
+`powerbi/data/`: five core datasets, four Module 2 datasets, and three Module 4
+datasets. Keep these aggregate tables independent in Power BI because they use
+different analytical grains. Refresh every export from PostgreSQL with:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
 .\powerbi\refresh_exports.ps1
 ```
 
-Do not manually edit generated CSV values. Full refresh, field, visual, and
-layout instructions are in [`powerbi/README.md`](powerbi/README.md).
+Do not manually edit generated CSV values. Current dataset definitions,
+refresh checks, page names, and links to the two build guides are in
+[`powerbi/README.md`](powerbi/README.md).
 
 ## Analysis Outputs
 
@@ -159,5 +153,6 @@ layout instructions are in [`powerbi/README.md`](powerbi/README.md).
 
 ## Next Milestone
 
-Complete and review the Power BI dashboard, record the export refresh date in
-the report, and then document the saved report or publication location.
+Review the completed Modules 2 and 4, finish any remaining dashboard modules,
+record the export refresh date, and document the saved PBIX or publication
+location.

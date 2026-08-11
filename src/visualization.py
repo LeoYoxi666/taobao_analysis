@@ -1,3 +1,5 @@
+"""Render the static charts used by the analysis report."""
+
 import os
 import matplotlib.pyplot as plt
 

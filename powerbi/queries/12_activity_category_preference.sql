@@ -1,3 +1,5 @@
+-- Power BI dataset: Top 5 categories within low, medium, and high activity tiers.
+-- NTILE(3) assigns users to equally sized tiers by total action count.
 WITH user_activity AS (
     SELECT
         e.user_id,

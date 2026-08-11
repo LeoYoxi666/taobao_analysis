@@ -27,6 +27,7 @@ if ($null -ne $psqlCommand) {
 
 New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
 
+# Declarative export manifest: query, output file, and expected row count.
 $exports = @(
     @{
         Query = "01_user_behaviour_overview.sql"
@@ -93,6 +94,7 @@ $exports = @(
 $passwordWasSetByScript = $false
 $previousPgOptions = $env:PGOPTIONS
 
+# Prompt only when the caller has not already supplied a PostgreSQL password.
 if ([string]::IsNullOrWhiteSpace($env:PGPASSWORD)) {
     $securePassword = Read-Host "PostgreSQL password for $User" -AsSecureString
     $credential = [System.Management.Automation.PSCredential]::new(
@@ -104,6 +106,7 @@ if ([string]::IsNullOrWhiteSpace($env:PGPASSWORD)) {
 }
 
 try {
+    # Prevent every export query from modifying the populated database.
     $env:PGOPTIONS = "-c default_transaction_read_only=on"
 
     foreach ($export in $exports) {
@@ -145,6 +148,7 @@ try {
                 )
             }
 
+            # Replace the published CSV only after the temporary file validates.
             Move-Item `
                 -LiteralPath $temporaryOutputPath `
                 -Destination $outputPath `
@@ -169,6 +173,7 @@ catch {
     throw
 }
 finally {
+    # Restore the caller's environment and remove any password created here.
     if ($null -eq $previousPgOptions) {
         Remove-Item Env:PGOPTIONS -ErrorAction SilentlyContinue
     } else {

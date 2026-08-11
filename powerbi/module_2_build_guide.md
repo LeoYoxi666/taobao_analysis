@@ -5,6 +5,13 @@ Power BI. Refresh the exports before importing the four new files. The query
 results are deliberately independent aggregate tables; do not create
 relationships among them.
 
+Final page names:
+
+1. `模块二-用户行为时段与购买率热力分析`
+2. `模块二-每日行为趋势与购买率`
+3. `模块二-用户活跃度分布与购买率`
+4. `模块二-用户购买次数分布（复购结构）`
+
 ## 1. Refresh and import
 
 From the project root, run:
@@ -84,25 +91,22 @@ DIVIDE(
 repeated percentage values. It means purchasing users divided by viewing users
 on each date. It is a same-period propensity indicator, not a session funnel.
 
-## 3. Create the five visuals
+## 3. Create the four pages
 
-1. **Behaviour heatmap** - Matrix: rows `weekday_name`; columns
-   `activity_hour`; values `Sum of action_count`. Add a `behaviour_name` slicer
-   and set matrix background conditional formatting to a light-to-dark warm
-   colour scale.
-2. **Purchase-rate heatmap** - Matrix: rows `weekday_name`; columns
-   `activity_hour`; values `Average of purchase_rate`. Format as a percentage
-   and apply the same conditional-format scale. Add the definition to the
-   title or subtitle: `Purchasing users / viewing users in the same time cell`.
-3. **Daily behaviour and purchase-rate trend** - Line and clustered column
-   chart: shared axis `activity_date`; column Y-axis the four daily action
-   measures; line Y-axis `Daily Purchase Rate`. Put `day_type` in Tooltips.
-4. **Activity distribution and purchase rate** - Line and clustered column
-   chart filtered to `distribution_type = Activity`: shared axis `bin_label`;
+1. **Timing and purchase-rate heatmaps** - Add two Matrix visuals. Both use
+   rows `weekday_name` and columns `activity_hour`. Use `Sum of action_count`
+   for the behaviour matrix and `Average of purchase_rate` for the rate
+   matrix. Add a `behaviour_name` slicer and use a consistent warm background
+   gradient.
+2. **Daily behaviour trend and purchase rate** - Line and clustered column
+   chart: X-axis `activity_date`; column Y-axis the four daily action measures;
+   line Y-axis `Daily Purchase Rate`.
+3. **User activity distribution and purchase rate** - Line and clustered
+   column chart filtered to `distribution_type = Activity`: X-axis `bin_label`;
    column Y-axis `Sum of user_count`; line Y-axis `Average of purchase_rate`.
-5. **Purchase-frequency distribution** - Clustered column chart filtered to
+4. **Purchase-frequency distribution** - Clustered column chart filtered to
    `distribution_type = Purchase Frequency`: X-axis `bin_label`; Y-axis
-   `Sum of user_count`; put `user_share` in Tooltips.
+   `Sum of user_count`.
 
 The native Power BI visual does not consistently support a logarithmic
 categorical X-axis. The precomputed 1, 2-3, 4-7, ... activity bins are
@@ -111,10 +115,9 @@ axis.
 
 ## 4. Layout and review
 
-Arrange the two heatmaps in the first row, the daily trend across the second
-row, and the two distribution charts in the third row. Use warm colours for
-high activity and high purchase rate, and keep labels and percentage precision
-consistent. Add the export refresh date to a subtitle before sharing.
+Keep each analysis on its named page and use warm colours for high activity or
+purchase rate. Keep titles, labels, percentage precision, and margins
+consistent. Add the export refresh date before sharing.
 
 Validate that the behaviour heatmap has 7 rows and 24 columns, the trend has
 four action series plus one rate series, and empty distribution bins remain

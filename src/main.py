@@ -1,3 +1,5 @@
+"""Run the established analysis and chart workflow."""
+
 from .analysis import (
     analyze_purchased_categories,
     analyze_purchased_items,
