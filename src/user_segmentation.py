@@ -1,4 +1,4 @@
-"""Build user metrics and assign mutually exclusive activity segments."""
+"""构建用户指标，并划分互斥的用户群体。"""
 
 import math
 
@@ -23,6 +23,9 @@ USER_SEGMENT_ORDER = [
 
 
 def analyze_user_segmentation(df):
+    """汇总用户行为指标，按活跃度和购买次数完成分群。"""
+
+    # 汇总每位用户的总行为数和各类行为数。
     total_actions = df.groupby(
         "user_id",
         sort=False
@@ -39,6 +42,7 @@ def analyze_user_segmentation(df):
         .reindex(total_actions.index, fill_value=0)
     )
 
+    # 去除具体时分秒，用于统计每位用户的活跃天数。
     active_days = (
         df["time"]
         .dt.normalize()
@@ -63,7 +67,7 @@ def analyze_user_segmentation(df):
         fill_value=0
     )
 
-    # Thresholds follow the project's continuous 80th-percentile rule.
+    # 高活跃和高购买阈值均采用连续型第 80 百分位数。
     high_activity_threshold = user_summary["total_actions"].quantile(
         HIGH_ACTIVITY_QUANTILE
     )
@@ -84,7 +88,7 @@ def analyze_user_segmentation(df):
         & (user_summary["total_actions"] >= high_activity_threshold)
     )
 
-    # Assignment order makes the four segments mutually exclusive.
+    # 按优先级覆盖标签，保证每位用户只属于一个群体。
     user_summary["segment"] = "Regular Buyer"
     user_summary.loc[
         high_activity_low_purchase_users,

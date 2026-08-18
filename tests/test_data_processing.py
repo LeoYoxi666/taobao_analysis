@@ -1,3 +1,5 @@
+"""验证数据读取、时间转换和质量检查。"""
+
 from unittest.mock import patch
 
 import pandas as pd
@@ -11,6 +13,8 @@ from src.data_processing import (
 
 
 def test_load_data_uses_configured_path_without_reading_real_csv():
+    """读取函数应使用配置路径，测试时不访问真实大文件。"""
+
     expected = pd.DataFrame({
         "user_id": [1, 2],
         "behavior_type": [1, 4]
@@ -27,6 +31,8 @@ def test_load_data_uses_configured_path_without_reading_real_csv():
 
 
 def test_prepare_datetime_converts_time_column():
+    """字符串时间应被原地转换为 pandas 时间类型。"""
+
     df = pd.DataFrame({
         "time": ["2024-01-01 09:30:00", "2024-01-02 18:45:00"]
     })
@@ -41,6 +47,8 @@ def test_prepare_datetime_converts_time_column():
 
 
 def test_check_data_quality_reports_missing_values_and_duplicates(capsys):
+    """质量检查输出应包含缺失值和重复行统计。"""
+
     df = pd.DataFrame({
         "user_id": [1, 1, 2],
         "item_id": [10, 10, None]

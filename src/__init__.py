@@ -1,1 +1,1 @@
-"""Taobao user behavior analysis package."""
+"""淘宝用户行为分析包。"""

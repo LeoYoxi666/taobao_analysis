@@ -1,4 +1,4 @@
-"""Classify chronological purchase paths for each user-item history."""
+"""按用户与商品的行为时间线识别购买路径。"""
 
 import pandas as pd
 
@@ -11,6 +11,8 @@ from .config import (
 
 
 def analyze_purchase_behavior_paths(df, purchase_data):
+    """分类每次购买前的行为路径，并返回数量和占比。"""
+
     purchase_path_labels = [
         "View -> Purchase",
         "View -> Cart -> Purchase",
@@ -19,7 +21,7 @@ def analyze_purchase_behavior_paths(df, purchase_data):
         "Other"
     ]
 
-    # Ignore user-item histories that never reach Purchase.
+    # 只分析最终产生购买的“用户-商品”组合。
     purchase_pairs = (
         purchase_data[["user_id", "item_id"]]
         .drop_duplicates()
@@ -36,7 +38,8 @@ def analyze_purchase_behavior_paths(df, purchase_data):
         .sort_values(["user_id", "item_id", "time"], kind="mergesort")
     )
 
-    # Cumulative flags capture which prerequisite behaviours occurred earlier.
+    # 累计标记用于判断当前购买前是否出现过浏览、收藏或加购。
+    # 为每个“用户-商品”组合生成编号，便于按组累计历史行为。
     purchase_path_groups = purchase_path_data.groupby(
         ["user_id", "item_id"],
         sort=False,
@@ -83,7 +86,7 @@ def analyze_purchase_behavior_paths(df, purchase_data):
         sort=False
     ).cummax()
 
-    # Later assignments implement the documented most-specific-path precedence.
+    # 后赋值覆盖前赋值，使更完整的路径拥有更高分类优先级。
     classified_purchase_paths = pd.Series(
         "Other",
         index=purchase_path_data.index

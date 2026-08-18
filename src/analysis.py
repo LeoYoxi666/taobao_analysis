@@ -1,4 +1,4 @@
-"""Core descriptive, funnel, and hourly analyses."""
+"""数据概览、购买排行、转化漏斗和小时趋势分析。"""
 
 from .config import (
     CART_BEHAVIOR,
@@ -9,6 +9,8 @@ from .config import (
 
 
 def display_dataset_summary(df):
+    """输出数据规模、字段和核心实体数量。"""
+
     print(df.head())
 
     print("\nShape:")
@@ -30,6 +32,8 @@ def display_dataset_summary(df):
 
 
 def analyze_purchased_items(df):
+    """筛选购买记录，并输出购买次数最多的商品。"""
+
     print(f"\nTop {TOP_N} purchased items:")
 
     purchase_data = df[df["behavior_type"] == PURCHASE_BEHAVIOR]
@@ -46,6 +50,8 @@ def analyze_purchased_items(df):
 
 
 def analyze_purchased_categories(purchase_data):
+    """统计购买次数最多的商品类别。"""
+
     print(f"\nTop {TOP_N} purchased categories:")
 
     top_categories = (
@@ -60,6 +66,8 @@ def analyze_purchased_categories(purchase_data):
 
 
 def calculate_behavior_distribution(df):
+    """统计各行为类型的记录数。"""
+
     print("\nBehavior distribution:")
 
     behavior_count = df["behavior_type"].value_counts()
@@ -70,11 +78,11 @@ def calculate_behavior_distribution(df):
 
 
 def calculate_chronological_funnel(df):
-    """Count users reaching View -> Cart -> Purchase in strict time order."""
+    """按严格时间顺序统计“浏览→加购→购买”漏斗人数。"""
 
     print("\nUser behaviour funnel:")
 
-    # Each stage must occur strictly after the preceding valid stage.
+    # 每个阶段必须发生在上一有效阶段之后，避免把乱序行为计入漏斗。
     view_times = (
         df[df["behavior_type"] == VIEW_BEHAVIOR]
         .groupby("user_id")["time"]
@@ -132,8 +140,11 @@ def calculate_chronological_funnel(df):
 
 
 def calculate_hourly_trend(df):
+    """按小时统计全部行为量和购买行为量。"""
+
     df["hour"] = df["time"].dt.hour
 
+    # 补齐 0—23 时，没有行为的小时以 0 填充。
     hourly_action_counts = (
         df["hour"]
         .value_counts()

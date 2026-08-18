@@ -1,4 +1,4 @@
-"""Render the static charts used by the analysis report."""
+"""生成分析报告使用的静态图表。"""
 
 import os
 import matplotlib.pyplot as plt
@@ -18,6 +18,9 @@ from .config import (
 
 
 def plot_purchased_category_chart(top_categories):
+    """绘制购买次数最多的商品类别横向柱状图。"""
+
+    # 已存在时跳过生成，避免重复覆盖人工调整后的图表。
     if not os.path.exists(TOP_CATEGORIES_PATH):
         plt.figure(figsize=FIGURE_SIZE)
 
@@ -45,6 +48,8 @@ def plot_purchased_category_chart(top_categories):
 
 
 def plot_behavior_distribution_chart(behavior_count):
+    """绘制用户行为数量分布柱状图。"""
+
     plt.figure(figsize=BEHAVIOR_DISTRIBUTION_FIGURE_SIZE)
 
     ax = behavior_count.plot(kind="bar", logy=False)
@@ -76,6 +81,8 @@ def plot_user_funnel_chart(
     cart_after_view_users,
     purchase_after_cart_users
 ):
+    """绘制浏览、加购和购买三阶段用户漏斗。"""
+
     funnel_labels = ["View", "Cart after View", "Purchase after Cart"]
     funnel_counts = [
         view_users,
@@ -112,6 +119,8 @@ def plot_hourly_trend_chart(
     hourly_action_counts,
     hourly_purchase_counts
 ):
+    """绘制全天行为量与购买量的小时趋势。"""
+
     plt.figure(figsize=HOURLY_TREND_FIGURE_SIZE)
 
     plt.plot(
@@ -145,6 +154,8 @@ def plot_purchase_behavior_path_chart(
     purchase_path_counts,
     purchase_path_percentages
 ):
+    """绘制各购买路径的次数和占比。"""
+
     plt.figure(figsize=FIGURE_SIZE)
 
     ax = plt.barh(purchase_path_labels, purchase_path_counts.values)
@@ -178,6 +189,8 @@ def plot_user_segmentation_chart(
     segment_counts,
     segment_percentages
 ):
+    """绘制各用户群体的人数和占比。"""
+
     plt.figure(figsize=FIGURE_SIZE)
 
     bars = plt.bar(segment_counts.index, segment_counts.values)

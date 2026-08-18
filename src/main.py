@@ -1,4 +1,4 @@
-"""Run the established analysis and chart workflow."""
+"""按既定顺序执行完整分析与图表生成流程。"""
 
 from .analysis import (
     analyze_purchased_categories,
@@ -26,6 +26,9 @@ from .visualization import (
 
 
 def main():
+    """串联数据读取、质量检查、分析和可视化。"""
+
+    # 基础概览与购买品类分析
     df = load_data()
     display_dataset_summary(df)
 
@@ -36,6 +39,7 @@ def main():
     behavior_count = calculate_behavior_distribution(df)
     plot_behavior_distribution_chart(behavior_count)
 
+    # 时间字段必须先转换，才能执行漏斗、趋势和用户分群分析。
     check_data_quality(df)
     prepare_datetime(df)
 
@@ -45,6 +49,7 @@ def main():
     hourly_counts = calculate_hourly_trend(df)
     plot_hourly_trend_chart(*hourly_counts)
 
+    # 用户分群与购买路径属于综合分析结果。
     user_segmentation_results = analyze_user_segmentation(df)
     plot_user_segmentation_chart(*user_segmentation_results[1:])
 
