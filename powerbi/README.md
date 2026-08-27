@@ -8,7 +8,9 @@ queries do not change the database schema or source data.
 
 - 12 query-backed CSV datasets are available in `powerbi/data/`.
 - Dashboard 1 Module 2 and Module 4 are built in a local Power BI report.
-- The PBIX location and publication status are not yet recorded here.
+- The local PBIX is kept outside the repository; the eight page screenshots
+  and analysis are included in `../docs/项目分析报告.md`.
+- The dashboard has not been published from this repository.
 
 ## Folder structure
 
@@ -108,6 +110,9 @@ Module 4:
 Detailed field placement and review checks are in
 [`module_2_build_guide.md`](module_2_build_guide.md) and
 [`module_4_build_guide.md`](module_4_build_guide.md).
+
+The final screenshots, findings, and business interpretation are in the
+[`project analysis report`](../docs/项目分析报告.md).
 
 ## Metric cautions
 

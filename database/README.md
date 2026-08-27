@@ -5,9 +5,9 @@
 The PostgreSQL stage is complete. PostgreSQL 17 is installed, the
 `taobao_analysis` database and `taobao` schema have been created, the full CSV
 has been imported successfully, and all four SQL analysis files have been run.
-The results were validated against the established Python outputs and are
-documented in
-[`../docs/sql_analysis_results.md`](../docs/sql_analysis_results.md).
+The results were validated against the established Python outputs. Final
+findings, metric definitions, and limitations are documented in
+[`../docs/项目分析报告.md`](../docs/项目分析报告.md).
 
 This file contains the durable database architecture, safe rebuild procedure,
 and validation rules.
@@ -122,10 +122,10 @@ The SQL layer preserves the established Python rules:
 
 ## Power BI Handoff
 
-The completed SQL results feed five read-only export queries in
+The completed SQL results feed the read-only export queries in
 `../powerbi/queries/`. The checked-in aggregates and guarded refresh workflow
-are documented in [`../powerbi/README.md`](../powerbi/README.md). Dashboard
-creation is currently in progress.
+are documented in [`../powerbi/README.md`](../powerbi/README.md). The eight
+documented Power BI pages are complete.
 
 For a deployed dashboard, use a dedicated read-only reporting role rather than
 an administrator account. Never commit database passwords, connection secrets,
